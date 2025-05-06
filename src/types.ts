@@ -1,4 +1,4 @@
-export interface PoolDynamicParams {
+export interface PoolMetric {
   poolId: string;
   tokenA: {
     symbol: string;

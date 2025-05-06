@@ -31,6 +31,33 @@ export async function retryableRequest<T = any>(
   throw lastError;
 }
 
+export async function retryableFetch(
+  url: string,
+  options: RequestInit = {},
+  retries = 3,
+  delay = 1000
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(
+          `Request failed with status ${response.status}: ${response.statusText}`
+        );
+      }
+      return response;
+    } catch (err) {
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error("Unexpected error in retryableFetch");
+}
+
+
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
